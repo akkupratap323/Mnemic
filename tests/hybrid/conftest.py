@@ -85,6 +85,27 @@ class FakeGraphSearcher:
         return list(self.facts[:num_results])
 
 
+class _FakeEdge:
+    def __init__(self, uuid: str, fact: str) -> None:
+        self.uuid = uuid
+        self.fact = fact
+
+
+@dataclass
+class FakeMnemicClient:
+    """Stands in for a real Mnemic instance (async remember + search)."""
+
+    remember_calls: list[dict] = field(default_factory=list)
+    facts: list[tuple[str, str]] = field(default_factory=list)
+
+    async def remember(self, **kwargs: object) -> object:
+        self.remember_calls.append(dict(kwargs))
+        return {'ok': True}
+
+    async def search(self, query: str, *, num_results: int = 10) -> list[_FakeEdge]:
+        return [_FakeEdge(uid, fact) for uid, fact in self.facts[:num_results]]
+
+
 @pytest.fixture
 def embedder() -> FakeEmbedder:
     return FakeEmbedder()

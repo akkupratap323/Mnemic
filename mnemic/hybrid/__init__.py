@@ -23,6 +23,7 @@ from mnemic.hybrid.errors import (
     HybridMemoryError,
     InvalidInput,
 )
+from mnemic.hybrid.factory import build_hybrid_memory
 from mnemic.hybrid.fusion import (
     FusedHit,
     GraphFact,
@@ -34,6 +35,7 @@ from mnemic.hybrid.fusion import (
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.router import WriteRouter
 from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
+from mnemic.hybrid.sqlite_store import SQLiteVectorStore
 from mnemic.hybrid.tools import MemoryTools
 from mnemic.hybrid.types import (
     MemoryItem,
@@ -69,11 +71,13 @@ __all__ = [
     'MnemicGraphSearcher',
     'RememberResult',
     'RouteDecision',
+    'SQLiteVectorStore',
     'SearchHit',
     'SignalClassifier',
     'Tier',
     'VectorStore',
     'WriteRouter',
+    'build_hybrid_memory',
     'normalize_text',
     'reciprocal_rank_fusion',
 ]
