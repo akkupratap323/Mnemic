@@ -9,6 +9,7 @@ Licensed under the Apache License, Version 2.0.
 from __future__ import annotations
 
 from mnemic.hybrid.access import AccessLog
+from mnemic.hybrid.cache import CachingEmbedder
 from mnemic.hybrid.classifier import SignalClassifier
 from mnemic.hybrid.consolidation import (
     ConsolidationPolicy,
@@ -32,6 +33,8 @@ from mnemic.hybrid.fusion import (
 )
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.router import WriteRouter
+from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
+from mnemic.hybrid.tools import MemoryTools
 from mnemic.hybrid.types import (
     MemoryItem,
     RememberResult,
@@ -42,7 +45,10 @@ from mnemic.hybrid.types import (
 from mnemic.hybrid.vector_store import InMemoryVectorStore, VectorStore
 
 __all__ = [
+    'CODE_EDGE_TYPES',
+    'CODE_ENTITY_TYPES',
     'AccessLog',
+    'CachingEmbedder',
     'ConsolidationPolicy',
     'ConsolidationReport',
     'Consolidator',
@@ -59,6 +65,7 @@ __all__ = [
     'InMemoryVectorStore',
     'InvalidInput',
     'MemoryItem',
+    'MemoryTools',
     'MnemicGraphSearcher',
     'RememberResult',
     'RouteDecision',
