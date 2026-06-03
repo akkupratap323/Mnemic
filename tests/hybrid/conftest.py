@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 import pytest
 
 from mnemic.hybrid.errors import InvalidInput
+from mnemic.hybrid.fusion import GraphFact
 
 _TOKEN_RE = re.compile(r'[a-z0-9]+')
 
@@ -70,6 +71,18 @@ def make_counter_ids(prefix: str = 'id') -> Callable[[], str]:
         return f'{prefix}-{state["n"]}'
 
     return _next
+
+
+@dataclass
+class FakeGraphSearcher:
+    """Returns a fixed ranked list of GraphFacts, ignoring the query."""
+
+    facts: list[GraphFact] = field(default_factory=list)
+    calls: list[str] = field(default_factory=list)
+
+    async def search(self, query: str, *, num_results: int = 10) -> list[GraphFact]:
+        self.calls.append(query)
+        return list(self.facts[:num_results])
 
 
 @pytest.fixture

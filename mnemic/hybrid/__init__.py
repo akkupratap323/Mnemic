@@ -16,6 +16,14 @@ from mnemic.hybrid.errors import (
     HybridMemoryError,
     InvalidInput,
 )
+from mnemic.hybrid.fusion import (
+    FusedHit,
+    GraphFact,
+    GraphSearcher,
+    MnemicGraphSearcher,
+    normalize_text,
+    reciprocal_rank_fusion,
+)
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.router import WriteRouter
 from mnemic.hybrid.types import (
@@ -32,12 +40,16 @@ __all__ = [
     'DuplicateItem',
     'Embedder',
     'EmbedderClientAdapter',
+    'FusedHit',
+    'GraphFact',
     'GraphMemory',
+    'GraphSearcher',
     'HybridMemory',
     'HybridMemoryError',
     'InMemoryVectorStore',
     'InvalidInput',
     'MemoryItem',
+    'MnemicGraphSearcher',
     'RememberResult',
     'RouteDecision',
     'SearchHit',
@@ -45,4 +57,6 @@ __all__ = [
     'Tier',
     'VectorStore',
     'WriteRouter',
+    'normalize_text',
+    'reciprocal_rank_fusion',
 ]

@@ -10,13 +10,20 @@ Licensed under the Apache License, Version 2.0.
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Protocol, runtime_checkable
 
 from mnemic.hybrid.embedder import Embedder
 from mnemic.hybrid.errors import InvalidInput
+from mnemic.hybrid.fusion import (
+    FusedHit,
+    GraphFact,
+    GraphSearcher,
+    normalize_text,
+    reciprocal_rank_fusion,
+)
 from mnemic.hybrid.router import WriteRouter
 from mnemic.hybrid.types import MemoryItem, RememberResult, SearchHit
 from mnemic.hybrid.vector_store import VectorStore
@@ -45,6 +52,7 @@ class HybridMemory:
     vector_store: VectorStore
     router: WriteRouter = field(default_factory=WriteRouter)
     graph: GraphMemory | None = None
+    graph_searcher: GraphSearcher | None = None
     clock: Callable[[], datetime] = _utcnow
     id_factory: Callable[[], str] = _uuid
 
@@ -108,3 +116,65 @@ class HybridMemory:
             raise InvalidInput('query must be a non-empty string')
         embedding = await self.embedder.embed(query)
         return await self.vector_store.search(embedding, k=k, where=where)
+
+    async def recall_fused(
+        self,
+        query: str,
+        *,
+        k: int = 10,
+        vector_k: int | None = None,
+        graph_k: int | None = None,
+        where: Mapping[str, object] | None = None,
+    ) -> list[FusedHit]:
+        """Blend vector-tier and graph-tier results into one RRF ranking.
+
+        Falls back to vector-only when no graph searcher is configured.
+        """
+        if not isinstance(query, str) or not query.strip():
+            raise InvalidInput('query must be a non-empty string')
+        if k <= 0:
+            raise InvalidInput('k must be a positive integer')
+
+        vector_hits = await self.recall(query, k=vector_k or k, where=where)
+        graph_facts: list[GraphFact] = []
+        if self.graph_searcher is not None:
+            graph_facts = await self.graph_searcher.search(query, num_results=graph_k or k)
+
+        content_by_key: dict[str, str] = {}
+        sources_by_key: dict[str, set[str]] = {}
+        vector_keys = _ranked_keys(
+            ((h.item.content, 'vector') for h in vector_hits), content_by_key, sources_by_key
+        )
+        graph_keys = _ranked_keys(
+            ((f.fact, 'graph') for f in graph_facts), content_by_key, sources_by_key
+        )
+
+        scores = reciprocal_rank_fusion([vector_keys, graph_keys])
+        hits = [
+            FusedHit(
+                content=content_by_key[key],
+                score=score,
+                sources=tuple(sorted(sources_by_key[key])),
+            )
+            for key, score in scores.items()
+        ]
+        hits.sort(key=lambda h: (-h.score, h.content))
+        return hits[:k]
+
+
+def _ranked_keys(
+    pairs: Iterable[tuple[str, str]],
+    content_by_key: dict[str, str],
+    sources_by_key: dict[str, set[str]],
+) -> list[str]:
+    """Build a deduped, order-preserving key list and register content/sources."""
+    keys: list[str] = []
+    seen: set[str] = set()
+    for content, source in pairs:
+        key = normalize_text(content)
+        content_by_key.setdefault(key, content)
+        sources_by_key.setdefault(key, set()).add(source)
+        if key not in seen:
+            keys.append(key)
+            seen.add(key)
+    return keys
