@@ -5,7 +5,7 @@ description = "Mnemic MCP Server"
 readme = "README.md"
 requires-python = ">=3.10,<4"
 dependencies = [
-    "mcp>=1.9.4",
+    "mcp>=1.27.2",
     "openai>=1.91.0",
     "mnemic[falkordb]>=0.28.2",
     "pydantic-settings>=2.0.0",
