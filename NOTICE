@@ -1,0 +1,21 @@
+Mnemic
+Copyright 2026 Abishek
+
+------------------------------------------------------------------------
+Attribution (Apache License 2.0, Section 4)
+------------------------------------------------------------------------
+
+Mnemic is a derivative work based on "Graphiti"
+(https://github.com/getzep/graphiti), Copyright 2024 Zep Software, Inc.,
+licensed under the Apache License, Version 2.0.
+
+A copy of the Apache License 2.0 is provided in the LICENSE file. The
+original per-file copyright notices of Zep Software, Inc. are retained in
+the source files as required by the License.
+
+Significant modifications in this distribution (2026):
+  - Renamed the package and public API
+      graphiti_core -> mnemic, class Graphiti -> Mnemic
+  - Removed the bundled PostHog usage-analytics / telemetry module
+  - Updated project metadata, branding, and documentation
+  - (add your further changes here as you build on it)
