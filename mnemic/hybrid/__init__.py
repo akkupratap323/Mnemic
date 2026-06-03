@@ -8,7 +8,13 @@ Licensed under the Apache License, Version 2.0.
 
 from __future__ import annotations
 
+from mnemic.hybrid.access import AccessLog
 from mnemic.hybrid.classifier import SignalClassifier
+from mnemic.hybrid.consolidation import (
+    ConsolidationPolicy,
+    ConsolidationReport,
+    Consolidator,
+)
 from mnemic.hybrid.embedder import Embedder, EmbedderClientAdapter
 from mnemic.hybrid.errors import (
     DimensionMismatch,
@@ -36,6 +42,10 @@ from mnemic.hybrid.types import (
 from mnemic.hybrid.vector_store import InMemoryVectorStore, VectorStore
 
 __all__ = [
+    'AccessLog',
+    'ConsolidationPolicy',
+    'ConsolidationReport',
+    'Consolidator',
     'DimensionMismatch',
     'DuplicateItem',
     'Embedder',

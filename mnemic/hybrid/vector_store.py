@@ -37,6 +37,8 @@ class VectorStore(Protocol):
 
     async def count(self) -> int: ...
 
+    async def all_items(self) -> list[MemoryItem]: ...
+
 
 class InMemoryVectorStore:
     """Dependency-free vector store for dev, tests, and small deployments.
@@ -93,6 +95,9 @@ class InMemoryVectorStore:
 
     async def count(self) -> int:
         return len(self._items)
+
+    async def all_items(self) -> list[MemoryItem]:
+        return list(self._items.values())
 
 
 def _matches(metadata: Mapping[str, object], where: Mapping[str, object]) -> bool:

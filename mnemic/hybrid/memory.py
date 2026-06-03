@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Protocol, runtime_checkable
 
+from mnemic.hybrid.access import AccessLog
 from mnemic.hybrid.embedder import Embedder
 from mnemic.hybrid.errors import InvalidInput
 from mnemic.hybrid.fusion import (
@@ -53,6 +54,7 @@ class HybridMemory:
     router: WriteRouter = field(default_factory=WriteRouter)
     graph: GraphMemory | None = None
     graph_searcher: GraphSearcher | None = None
+    access_log: AccessLog | None = None
     clock: Callable[[], datetime] = _utcnow
     id_factory: Callable[[], str] = _uuid
 
@@ -115,7 +117,11 @@ class HybridMemory:
         if not isinstance(query, str) or not query.strip():
             raise InvalidInput('query must be a non-empty string')
         embedding = await self.embedder.embed(query)
-        return await self.vector_store.search(embedding, k=k, where=where)
+        hits = await self.vector_store.search(embedding, k=k, where=where)
+        if self.access_log is not None:
+            for hit in hits:
+                self.access_log.record(hit.item.id)
+        return hits
 
     async def recall_fused(
         self,
