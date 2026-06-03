@@ -13,8 +13,8 @@ LABEL org.opencontainers.image.version="${MNEMIC_VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.revision="${VCS_REF}"
 LABEL org.opencontainers.image.vendor="Abishek"
-LABEL org.opencontainers.image.source="https://github.com/your-username/mnemic"
-LABEL org.opencontainers.image.documentation="https://github.com/your-username/mnemic/tree/main/server"
+LABEL org.opencontainers.image.source="https://github.com/akkupratap323/Mnemic"
+LABEL org.opencontainers.image.documentation="https://github.com/akkupratap323/Mnemic/tree/main/server"
 LABEL io.mnemic.core.version="${MNEMIC_VERSION}"
 
 # Install uv using the installer script

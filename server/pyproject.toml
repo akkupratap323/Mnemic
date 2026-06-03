@@ -1,9 +1,9 @@
 [project]
 name = "graph-service"
 version = "0.1.0"
-description = "Mnemic graph service implementing Mnemic package"
+description = "Mnemic graph service implementing the Mnemic package"
 authors = [
-    { "name" = "Paul Paliychuk", "email" = "paul@your-username.com" },
+    { "name" = "Abishek" },
 ]
 readme = "README.md"
 requires-python = ">=3.10"

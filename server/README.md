@@ -1,6 +1,6 @@
 # graph-service
 
-Graph service is a fast api server implementing the [mnemic](https://github.com/your-username/mnemic) package.
+Graph service is a fast api server implementing the [mnemic](https://github.com/akkupratap323/mnemic) package.
 
 ## Container Releases
 

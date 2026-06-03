@@ -32,13 +32,13 @@ The Mnemic MCP server provides comprehensive knowledge graph capabilities:
 ### Clone the Mnemic GitHub repo
 
 ```bash
-git clone https://github.com/your-username/mnemic.git
+git clone https://github.com/akkupratap323/mnemic.git
 ```
 
 or
 
 ```bash
-gh repo clone your-username/mnemic
+gh repo clone akkupratap323/mnemic
 ```
 
 ### For Claude Desktop and other `stdio` only clients

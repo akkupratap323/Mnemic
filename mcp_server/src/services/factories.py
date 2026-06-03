@@ -156,7 +156,7 @@ class LLMClientFactory:
                 _validate_api_key('Azure OpenAI', api_key, logger)
 
                 # Azure OpenAI should use the standard AsyncOpenAI client with v1 compatibility endpoint
-                # See: https://github.com/your-username/mnemic README Azure OpenAI section
+                # See: https://github.com/akkupratap323/Mnemic README Azure OpenAI section
                 from openai import AsyncOpenAI
 
                 # Ensure the base_url ends with /openai/v1/ for Azure v1 compatibility
@@ -294,7 +294,7 @@ class EmbedderFactory:
                 _validate_api_key('Azure OpenAI Embedder', api_key, logger)
 
                 # Azure OpenAI should use the standard AsyncOpenAI client with v1 compatibility endpoint
-                # See: https://github.com/your-username/mnemic README Azure OpenAI section
+                # See: https://github.com/akkupratap323/Mnemic README Azure OpenAI section
                 from openai import AsyncOpenAI
 
                 # Ensure the base_url ends with /openai/v1/ for Azure v1 compatibility

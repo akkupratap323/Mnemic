@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/your-username/mnemic"
+Repository = "https://github.com/akkupratap323/Mnemic"
 
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.49.0"]
