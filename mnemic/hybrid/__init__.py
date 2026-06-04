@@ -9,6 +9,13 @@ Licensed under the Apache License, Version 2.0.
 from __future__ import annotations
 
 from mnemic.hybrid.access import AccessLog
+from mnemic.hybrid.agreement import (
+    AgreementReport,
+    GoldExample,
+    compute_agreement,
+    load_gold,
+    measure_agreement,
+)
 from mnemic.hybrid.cache import CachingEmbedder
 from mnemic.hybrid.classifier import SignalClassifier
 from mnemic.hybrid.config import HybridConfig
@@ -67,7 +74,12 @@ __all__ = [
     'CODE_EDGE_TYPES',
     'CODE_ENTITY_TYPES',
     'AccessLog',
+    'AgreementReport',
     'CachingEmbedder',
+    'GoldExample',
+    'compute_agreement',
+    'load_gold',
+    'measure_agreement',
     'ConsolidationPolicy',
     'ConsolidationReport',
     'ConsolidationScheduler',
