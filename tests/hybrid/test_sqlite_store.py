@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timezone
 
 import pytest
@@ -89,6 +90,12 @@ async def test_non_json_metadata_rejected(store):
     bad = MemoryItem(id='a', content='c', embedding=(1.0,), metadata={'x': {1, 2, 3}})
     with pytest.raises(InvalidInput):
         await store.add(bad)
+
+
+async def test_concurrent_adds_are_safe(store):
+    # offloaded to a thread pool + serialised by a lock -> no corruption
+    await asyncio.gather(*(store.add(item(f'i{i}', [1, i, 1])) for i in range(30)))
+    assert await store.count() == 30
 
 
 async def test_persistence_across_reopen(tmp_path):
