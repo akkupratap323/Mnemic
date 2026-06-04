@@ -24,6 +24,7 @@ from mnemic.hybrid.errors import (
     HybridMemoryError,
     InvalidInput,
 )
+from mnemic.hybrid.eval import EvalInstance, EvalReport, evaluate, load_longmemeval
 from mnemic.hybrid.factory import build_hybrid_memory
 from mnemic.hybrid.fusion import (
     FusedHit,
@@ -33,6 +34,7 @@ from mnemic.hybrid.fusion import (
     normalize_text,
     reciprocal_rank_fusion,
 )
+from mnemic.hybrid.hashing_embedder import HashingEmbedder
 from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.metrics import Metrics
@@ -60,8 +62,13 @@ __all__ = [
     'ConsolidationScheduler',
     'Consolidator',
     'DimensionMismatch',
+    'EvalInstance',
+    'EvalReport',
+    'HashingEmbedder',
     'HybridConfig',
     'Metrics',
+    'evaluate',
+    'load_longmemeval',
     'DuplicateItem',
     'Embedder',
     'EmbedderClientAdapter',
