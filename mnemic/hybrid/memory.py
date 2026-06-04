@@ -26,7 +26,7 @@ from mnemic.hybrid.fusion import (
     reciprocal_rank_fusion,
 )
 from mnemic.hybrid.metrics import Metrics
-from mnemic.hybrid.router import WriteRouter
+from mnemic.hybrid.router import Router, WriteRouter
 from mnemic.hybrid.types import MemoryItem, RememberResult, SearchHit
 from mnemic.hybrid.vector_store import VectorStore
 
@@ -52,7 +52,7 @@ class HybridMemory:
 
     embedder: Embedder
     vector_store: VectorStore
-    router: WriteRouter = field(default_factory=WriteRouter)
+    router: Router = field(default_factory=WriteRouter)
     graph: GraphMemory | None = None
     graph_searcher: GraphSearcher | None = None
     access_log: AccessLog | None = None
@@ -84,7 +84,8 @@ class HybridMemory:
         )
         await self.vector_store.add(item)  # vector tier is the source of truth
 
-        decision = self.router.route(content, metadata)
+        # reuse the embedding we just computed — learned routing is then free
+        decision = self.router.route(content, metadata, embedding=embedding)
         graph_written = False
         graph_error: str | None = None
         if decision.writes_graph and self.graph is not None:

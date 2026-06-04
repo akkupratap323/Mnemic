@@ -35,10 +35,20 @@ from mnemic.hybrid.fusion import (
     reciprocal_rank_fusion,
 )
 from mnemic.hybrid.hashing_embedder import HashingEmbedder
+from mnemic.hybrid.learned_router import LearnedRouter
 from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.metrics import Metrics
-from mnemic.hybrid.router import WriteRouter
+from mnemic.hybrid.router import Router, WriteRouter
+from mnemic.hybrid.router_training import (
+    HeuristicLabeler,
+    LabeledExample,
+    TeacherLabeler,
+    add_failure_labels,
+    build_training_set,
+    evaluate_router,
+    train_logistic,
+)
 from mnemic.hybrid.scheduler import ConsolidationScheduler
 from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
 from mnemic.hybrid.sqlite_store import SQLiteVectorStore
@@ -65,8 +75,17 @@ __all__ = [
     'EvalInstance',
     'EvalReport',
     'HashingEmbedder',
+    'HeuristicLabeler',
     'HybridConfig',
+    'LabeledExample',
+    'LearnedRouter',
     'Metrics',
+    'Router',
+    'TeacherLabeler',
+    'add_failure_labels',
+    'build_training_set',
+    'evaluate_router',
+    'train_logistic',
     'evaluate',
     'load_longmemeval',
     'DuplicateItem',
