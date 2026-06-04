@@ -32,6 +32,7 @@ from mnemic.hybrid.fusion import (
     normalize_text,
     reciprocal_rank_fusion,
 )
+from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.router import WriteRouter
 from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
@@ -79,5 +80,6 @@ __all__ = [
     'WriteRouter',
     'build_hybrid_memory',
     'normalize_text',
+    'register_memory_tools',
     'reciprocal_rank_fusion',
 ]
