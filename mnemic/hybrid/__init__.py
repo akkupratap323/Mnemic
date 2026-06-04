@@ -39,6 +39,7 @@ from mnemic.hybrid.learned_router import LearnedRouter
 from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.metrics import Metrics
+from mnemic.hybrid.ollama_teacher import OllamaTeacher
 from mnemic.hybrid.router import Router, WriteRouter
 from mnemic.hybrid.router_training import (
     HeuristicLabeler,
@@ -80,6 +81,7 @@ __all__ = [
     'LabeledExample',
     'LearnedRouter',
     'Metrics',
+    'OllamaTeacher',
     'Router',
     'TeacherLabeler',
     'add_failure_labels',
