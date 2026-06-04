@@ -25,6 +25,7 @@ from mnemic.hybrid.fusion import (
     normalize_text,
     reciprocal_rank_fusion,
 )
+from mnemic.hybrid.metrics import Metrics
 from mnemic.hybrid.router import WriteRouter
 from mnemic.hybrid.types import MemoryItem, RememberResult, SearchHit
 from mnemic.hybrid.vector_store import VectorStore
@@ -55,6 +56,7 @@ class HybridMemory:
     graph: GraphMemory | None = None
     graph_searcher: GraphSearcher | None = None
     access_log: AccessLog | None = None
+    metrics: Metrics | None = None
     clock: Callable[[], datetime] = _utcnow
     id_factory: Callable[[], str] = _uuid
 
@@ -100,6 +102,9 @@ class HybridMemory:
             except Exception as exc:  # graph failure must not lose the vector write
                 graph_error = f'{type(exc).__name__}: {exc}'
 
+        if self.metrics is not None:
+            self.metrics.record_remember(graph_written=graph_written)
+
         return RememberResult(
             item=item,
             decision=decision,
@@ -121,6 +126,8 @@ class HybridMemory:
         if self.access_log is not None:
             for hit in hits:
                 self.access_log.record(hit.item.id)
+        if self.metrics is not None:
+            self.metrics.record_recall()
         return hits
 
     async def recall_fused(
@@ -140,6 +147,8 @@ class HybridMemory:
             raise InvalidInput('query must be a non-empty string')
         if k <= 0:
             raise InvalidInput('k must be a positive integer')
+        if self.metrics is not None:
+            self.metrics.record_fused_recall()
 
         vector_hits = await self.recall(query, k=vector_k or k, where=where)
         graph_facts: list[GraphFact] = []

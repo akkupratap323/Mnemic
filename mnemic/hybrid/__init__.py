@@ -11,6 +11,7 @@ from __future__ import annotations
 from mnemic.hybrid.access import AccessLog
 from mnemic.hybrid.cache import CachingEmbedder
 from mnemic.hybrid.classifier import SignalClassifier
+from mnemic.hybrid.config import HybridConfig
 from mnemic.hybrid.consolidation import (
     ConsolidationPolicy,
     ConsolidationReport,
@@ -34,7 +35,9 @@ from mnemic.hybrid.fusion import (
 )
 from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
+from mnemic.hybrid.metrics import Metrics
 from mnemic.hybrid.router import WriteRouter
+from mnemic.hybrid.scheduler import ConsolidationScheduler
 from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
 from mnemic.hybrid.sqlite_store import SQLiteVectorStore
 from mnemic.hybrid.tools import MemoryTools
@@ -54,8 +57,11 @@ __all__ = [
     'CachingEmbedder',
     'ConsolidationPolicy',
     'ConsolidationReport',
+    'ConsolidationScheduler',
     'Consolidator',
     'DimensionMismatch',
+    'HybridConfig',
+    'Metrics',
     'DuplicateItem',
     'Embedder',
     'EmbedderClientAdapter',
