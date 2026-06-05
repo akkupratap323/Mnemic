@@ -16,6 +16,7 @@ from mnemic.hybrid.agreement import (
     load_gold,
     measure_agreement,
 )
+from mnemic.hybrid.api_teacher import ApiTeacher
 from mnemic.hybrid.cache import CachingEmbedder
 from mnemic.hybrid.classifier import SignalClassifier
 from mnemic.hybrid.config import HybridConfig
@@ -75,6 +76,7 @@ __all__ = [
     'CODE_ENTITY_TYPES',
     'AccessLog',
     'AgreementReport',
+    'ApiTeacher',
     'CachingEmbedder',
     'GoldExample',
     'compute_agreement',

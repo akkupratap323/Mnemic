@@ -21,6 +21,7 @@ import argparse
 import asyncio
 import os
 
+from mnemic.hybrid.api_teacher import ApiTeacher
 from mnemic.hybrid.eval import load_longmemeval
 from mnemic.hybrid.hashing_embedder import HashingEmbedder
 from mnemic.hybrid.ollama_teacher import OllamaTeacher
@@ -48,15 +49,23 @@ def _collect_texts(data_path: str, limit: int) -> list[str]:
     return texts
 
 
-async def run(data_path: str, limit: int, teacher_fraction: float, model: str) -> None:
+def _make_teacher(backend: str, model: str | None):
+    if backend == 'api':  # DeepSeek / OpenAI-compatible
+        return ApiTeacher(model=model or 'deepseek-chat')
+    return OllamaTeacher(model=model or 'gemma3:12b')
+
+
+async def run(
+    data_path: str, limit: int, teacher_fraction: float, backend: str, model: str | None
+) -> None:
     texts = _collect_texts(data_path, limit)
     print(f'Collected {len(texts)} user turns.')
 
-    teacher = OllamaTeacher(model=model)
+    teacher = _make_teacher(backend, model)
     n_teacher = int(len(texts) * teacher_fraction)
     teacher_indices = list(range(n_teacher))
 
-    print(f'Labeling {n_teacher} with local {model}, the rest with the heuristic...')
+    print(f'Labeling {n_teacher} with {backend} ({teacher.model}), the rest with the heuristic...')
     examples = await build_training_set(
         texts, teacher=teacher, teacher_indices=teacher_indices
     )
@@ -80,13 +89,14 @@ async def run(data_path: str, limit: int, teacher_fraction: float, model: str) -
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Distill a learned router with a local Gemma teacher')
+    parser = argparse.ArgumentParser(description='Distill a learned router from a teacher')
     parser.add_argument('--data', default=_DEFAULT_DATA)
     parser.add_argument('--limit', type=int, default=300)
     parser.add_argument('--teacher-fraction', type=float, default=0.4)
-    parser.add_argument('--model', default='gemma3:12b')
+    parser.add_argument('--teacher', choices=['ollama', 'api'], default='ollama')
+    parser.add_argument('--model', default=None)
     args = parser.parse_args()
-    asyncio.run(run(args.data, args.limit, args.teacher_fraction, args.model))
+    asyncio.run(run(args.data, args.limit, args.teacher_fraction, args.teacher, args.model))
 
 
 if __name__ == '__main__':
