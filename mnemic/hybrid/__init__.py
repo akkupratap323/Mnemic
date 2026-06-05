@@ -47,6 +47,7 @@ from mnemic.hybrid.learned_router import LearnedRouter
 from mnemic.hybrid.mcp import register_memory_tools
 from mnemic.hybrid.memory import GraphMemory, HybridMemory
 from mnemic.hybrid.metrics import Metrics
+from mnemic.hybrid.ollama_embedder import OllamaEmbedder
 from mnemic.hybrid.ollama_teacher import OllamaTeacher
 from mnemic.hybrid.router import Router, WriteRouter
 from mnemic.hybrid.router_training import (
@@ -61,6 +62,7 @@ from mnemic.hybrid.router_training import (
 from mnemic.hybrid.scheduler import ConsolidationScheduler
 from mnemic.hybrid.schema import CODE_EDGE_TYPES, CODE_ENTITY_TYPES
 from mnemic.hybrid.sqlite_store import SQLiteVectorStore
+from mnemic.hybrid.st_embedder import SentenceTransformerEmbedder
 from mnemic.hybrid.tools import MemoryTools
 from mnemic.hybrid.types import (
     MemoryItem,
@@ -95,8 +97,10 @@ __all__ = [
     'LabeledExample',
     'LearnedRouter',
     'Metrics',
+    'OllamaEmbedder',
     'OllamaTeacher',
     'Router',
+    'SentenceTransformerEmbedder',
     'TeacherLabeler',
     'add_failure_labels',
     'build_training_set',

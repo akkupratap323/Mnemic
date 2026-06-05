@@ -19,25 +19,14 @@ import asyncio
 import os
 import sys
 
+from mnemic.hybrid.embedder_factory import EMBEDDER_BACKENDS, make_embedder
 from mnemic.hybrid.eval import EvalReport, evaluate, load_longmemeval
-from mnemic.hybrid.hashing_embedder import HashingEmbedder
 from mnemic.hybrid.memory import HybridMemory
 from mnemic.hybrid.vector_store import InMemoryVectorStore
 
 _DEFAULT_DATA = os.path.join(
     os.path.dirname(__file__), 'data', 'longmemeval_data', 'longmemeval_oracle.json'
 )
-
-
-def _make_embedder():
-    if os.environ.get('OPENAI_API_KEY'):
-        from mnemic.embedder import OpenAIEmbedder
-        from mnemic.hybrid.embedder import EmbedderClientAdapter
-
-        print('Using OpenAIEmbedder (real embeddings).', file=sys.stderr)
-        return EmbedderClientAdapter(OpenAIEmbedder())
-    print('No OPENAI_API_KEY set — using offline HashingEmbedder baseline.', file=sys.stderr)
-    return HashingEmbedder()
 
 
 def _print_report(report: EvalReport) -> None:
@@ -54,10 +43,13 @@ def main() -> None:
     parser.add_argument('--data', default=_DEFAULT_DATA)
     parser.add_argument('--limit', type=int, default=50)
     parser.add_argument('--k', type=int, default=10)
+    parser.add_argument('--embedder', choices=EMBEDDER_BACKENDS, default='hashing')
+    parser.add_argument('--embed-model', default=None)
     args = parser.parse_args()
 
     instances = load_longmemeval(args.data)
-    embedder = _make_embedder()
+    print(f'Embedder: {args.embedder} ({args.embed_model or "default"})', file=sys.stderr)
+    embedder = make_embedder(args.embedder, args.embed_model)
 
     def make_memory() -> HybridMemory:
         return HybridMemory(embedder=embedder, vector_store=InMemoryVectorStore())

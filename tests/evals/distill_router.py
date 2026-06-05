@@ -22,8 +22,8 @@ import asyncio
 import os
 
 from mnemic.hybrid.api_teacher import ApiTeacher
+from mnemic.hybrid.embedder_factory import EMBEDDER_BACKENDS, make_embedder
 from mnemic.hybrid.eval import load_longmemeval
-from mnemic.hybrid.hashing_embedder import HashingEmbedder
 from mnemic.hybrid.ollama_teacher import OllamaTeacher
 from mnemic.hybrid.router_training import (
     HeuristicLabeler,
@@ -56,7 +56,13 @@ def _make_teacher(backend: str, model: str | None):
 
 
 async def run(
-    data_path: str, limit: int, teacher_fraction: float, backend: str, model: str | None
+    data_path: str,
+    limit: int,
+    teacher_fraction: float,
+    backend: str,
+    model: str | None,
+    embedder_backend: str,
+    embed_model: str | None,
 ) -> None:
     texts = _collect_texts(data_path, limit)
     print(f'Collected {len(texts)} user turns.')
@@ -80,7 +86,7 @@ async def run(
     print(f'\nTeacher vs heuristic disagreement: {disagreements}/{n_teacher} ({rate:.1%})')
     print('  ^ these are facts the keyword router would have mis-routed.\n')
 
-    embedder = HashingEmbedder(dim=256)
+    embedder = make_embedder(embedder_backend, embed_model)
     router = await train_logistic(examples, embedder, epochs=400, lr=0.5)
     metrics = await evaluate_router(router, examples, embedder)
     print('Learned router (distilled) fit on the labeled set:')
@@ -95,8 +101,20 @@ def main() -> None:
     parser.add_argument('--teacher-fraction', type=float, default=0.4)
     parser.add_argument('--teacher', choices=['ollama', 'api'], default='ollama')
     parser.add_argument('--model', default=None)
+    parser.add_argument('--embedder', choices=EMBEDDER_BACKENDS, default='hashing')
+    parser.add_argument('--embed-model', default=None)
     args = parser.parse_args()
-    asyncio.run(run(args.data, args.limit, args.teacher_fraction, args.teacher, args.model))
+    asyncio.run(
+        run(
+            args.data,
+            args.limit,
+            args.teacher_fraction,
+            args.teacher,
+            args.model,
+            args.embedder,
+            args.embed_model,
+        )
+    )
 
 
 if __name__ == '__main__':
