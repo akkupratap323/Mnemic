@@ -1,0 +1,27 @@
+{
+  "benchmark": "longmemeval_answer_quality",
+  "run_at": "2026-06-05T07:27:26.916331+00:00",
+  "limit": 2,
+  "k": 10,
+  "metric": "llm-judged answer accuracy",
+  "stack": {
+    "llm": "deepseek-chat",
+    "embedder": "bge-m3",
+    "graph": "neo4j-5.26"
+  },
+  "accuracy": {
+    "A_vector": 0.0,
+    "B_full_graph": 0.5,
+    "C_hybrid": 0.0
+  },
+  "graph_writes": {
+    "A_vector": 0,
+    "B_full_graph": 60,
+    "C_hybrid": 30
+  },
+  "usd": {
+    "A_vector": 0.0,
+    "B_full_graph": 0.084,
+    "C_hybrid": 0.042
+  }
+}

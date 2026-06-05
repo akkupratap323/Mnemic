@@ -64,6 +64,29 @@ takeaways: (1) the hybrid keeps full-graph recall at lower cost (proven); (2) on
 real edge (multi-hop synthesis, contradiction handling) needs an LLM-judged
 answer-accuracy metric to show. We report what we measured, not what we hoped.
 
+## Proof #3 — answer accuracy (the harder, fairer test)
+LLM-judged answer accuracy, 8 questions (all temporal-reasoning), live stack
+(`tests/evals/answer_quality.py`; artifact `docs/results/answer_quality_8.json`):
+
+| Config | answer accuracy | graph writes | est_$ |
+|--------|----------------:|-------------:|------:|
+| A — vector only | 25% | 0 | $0.00 |
+| B — full-graph | 25% | 197 | $0.28 |
+| C — hybrid | 12% | 90 | $0.13 |
+
+**This does NOT support "hybrid keeps full-graph quality" — it argues against it.**
+- Full-graph did not beat vector (both 25%); on some questions the graph's facts
+  added noise that *hurt* the answer (e.g. q2: vector correct, graph wrong).
+- Hybrid scored lowest (12%): at the default routing threshold it lost quality
+  vs both A and B.
+- Overall accuracy is low (12-25%) — temporal-reasoning is hard and the simple
+  retrieve->answer->judge pipeline (k=10) is weak. Small, noisy sample (n=8).
+
+**Honest standing of the claim:** the cost saving (2.4x fewer graph writes) is
+real and measured; **quality parity is NOT demonstrated** and this test shows the
+opposite. A quality claim would require a larger type-diverse sample, a stronger
+answer pipeline, and router-threshold tuning to trace the cost/quality frontier.
+
 ## Caveats (read these)
 - The 2-calls/write figure is for short conversational turns; richer documents
   cost more.
