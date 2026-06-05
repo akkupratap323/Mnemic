@@ -41,9 +41,28 @@ full-graph writes everything (3,094); the hybrid router writes 1,261 (41%).
 **Hybrid = 41% of full-graph cost — a 2.4× saving.** Ratio is model-independent
 (it is the routing fraction); absolute $/time use the measured per-write cost.
 
-## Pending
-- **Proof #3 recall** (does hybrid keep full-graph's answer quality): needs the
-  A/B/C search run with the live graph. Unblocked; not yet run.
+## Proof #3 — recall (measured, 15 questions, live stack)
+Live A/B/C evidence-recall@10 on DeepSeek + bge-m3 + Neo4j 5.26
+(`tests/evals/live_recall.py`; artifact: `docs/results/live_recall_15.json`):
+
+| Config | evidence-recall@10 |
+|--------|-------------------:|
+| A — vector only | 100% |
+| B — full-graph | 100% |
+| C — hybrid | 100% |
+
+(All 15 are `temporal-reasoning` — LongMemEval's first instances.)
+
+**Hybrid recall = full-graph recall (100% = 100%)** — confirming the headline:
+*same recall, 41% of the cost.*
+
+**Honest caveat — the metric is saturated.** Vector-only also scores 100%, so
+evidence-recall@k does **not** isolate the graph's unique value here: with a
+strong embedder (bge-m3) the cheap tier already retrieves the evidence. Two
+takeaways: (1) the hybrid keeps full-graph recall at lower cost (proven); (2) on
+*this* metric/question-set the expensive graph adds no measurable recall — its
+real edge (multi-hop synthesis, contradiction handling) needs an LLM-judged
+answer-accuracy metric to show. We report what we measured, not what we hoped.
 
 ## Caveats (read these)
 - The 2-calls/write figure is for short conversational turns; richer documents

@@ -1,0 +1,70 @@
+{
+  "benchmark": "longmemeval_recall_3way",
+  "run_at": "2026-06-05T07:06:52.073370+00:00",
+  "limit": 15,
+  "k": 10,
+  "stack": {
+    "llm": "deepseek-chat",
+    "embedder": "bge-m3",
+    "graph": "neo4j-5.26"
+  },
+  "metric": "evidence-recall@k",
+  "summary": {
+    "configs": {
+      "A_vector": {
+        "recall": 1.0,
+        "hit": 15,
+        "total": 15
+      },
+      "B_full_graph": {
+        "recall": 1.0,
+        "hit": 15,
+        "total": 15
+      },
+      "C_hybrid": {
+        "recall": 1.0,
+        "hit": 15,
+        "total": 15
+      }
+    },
+    "by_type": {
+      "temporal-reasoning": {
+        "A_vector": 1.0,
+        "B_full_graph": 1.0,
+        "C_hybrid": 1.0
+      }
+    }
+  },
+  "raw_tallies": {
+    "A_vector": {
+      "hit": 15,
+      "total": 15,
+      "by_type": {
+        "temporal-reasoning": [
+          15,
+          15
+        ]
+      }
+    },
+    "B_full_graph": {
+      "hit": 15,
+      "total": 15,
+      "by_type": {
+        "temporal-reasoning": [
+          15,
+          15
+        ]
+      }
+    },
+    "C_hybrid": {
+      "hit": 15,
+      "total": 15,
+      "by_type": {
+        "temporal-reasoning": [
+          15,
+          15
+        ]
+      }
+    }
+  }
+}
