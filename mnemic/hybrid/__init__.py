@@ -17,6 +17,12 @@ from mnemic.hybrid.agreement import (
     measure_agreement,
 )
 from mnemic.hybrid.api_teacher import ApiTeacher
+from mnemic.hybrid.benchmark import (
+    BenchmarkReport,
+    ConfigResult,
+    CostModel,
+    run_three_way,
+)
 from mnemic.hybrid.cache import CachingEmbedder
 from mnemic.hybrid.classifier import SignalClassifier
 from mnemic.hybrid.config import HybridConfig
@@ -79,7 +85,11 @@ __all__ = [
     'AccessLog',
     'AgreementReport',
     'ApiTeacher',
+    'BenchmarkReport',
     'CachingEmbedder',
+    'ConfigResult',
+    'CostModel',
+    'run_three_way',
     'GoldExample',
     'compute_agreement',
     'load_gold',
