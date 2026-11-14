@@ -190,3 +190,78 @@ async def test_recall_records_access_and_consolidator_promotes():
     ).run()
     assert result.item.id in report.promoted
     assert len(graph.calls) == 1  # the frequently-recalled chatter graduated to the graph
+
+
+async def test_memory_already_in_graph_is_not_promoted_again():
+    store = InMemoryVectorStore()
+    log = AccessLog()
+    graph = RecordingGraph()
+    mem = HybridMemory(
+        embedder=FakeEmbedder(),
+        vector_store=store,
+        graph=graph,
+        access_log=log,
+        clock=lambda: NOW,
+        id_factory=make_counter_ids(),
+    )
+    result = await mem.remember('decision: adopt FalkorDB for the graph tier')
+    assert result.graph_written is True
+    for _ in range(3):
+        await mem.recall('decision: adopt FalkorDB for the graph tier', k=1)
+
+    report = await Consolidator(
+        vector_store=store,
+        graph=graph,
+        access_log=log,
+        policy=ConsolidationPolicy(promote_after_accesses=3),
+        clock=lambda: NOW,
+    ).run()
+    assert report.promoted == ()
+    assert len(graph.calls) == 1  # no second episode for the same memory
+
+
+async def test_memory_already_in_graph_is_kept_like_a_promoted_one():
+    store = InMemoryVectorStore()
+    log = AccessLog()
+    mem = HybridMemory(
+        embedder=FakeEmbedder(),
+        vector_store=store,
+        graph=RecordingGraph(),
+        access_log=log,
+        clock=lambda: NOW - timedelta(days=31),
+        id_factory=make_counter_ids(),
+    )
+    result = await mem.remember('decision: adopt FalkorDB for the graph tier')
+
+    report = await (await consolidator(store, RecordingGraph(), log)).run()
+    assert report.pruned == ()
+    assert await store.get(result.item.id) is not None
+
+
+async def test_failed_graph_write_is_promoted_by_a_later_pass():
+    store = InMemoryVectorStore()
+    log = AccessLog()
+    graph = RecordingGraph(raise_on_call=True)
+    mem = HybridMemory(
+        embedder=FakeEmbedder(),
+        vector_store=store,
+        graph=graph,
+        access_log=log,
+        clock=lambda: NOW,
+        id_factory=make_counter_ids(),
+    )
+    result = await mem.remember('decision: adopt FalkorDB for the graph tier')
+    assert result.graph_written is False
+    graph.raise_on_call = False
+    for _ in range(3):
+        await mem.recall('decision: adopt FalkorDB for the graph tier', k=1)
+
+    report = await Consolidator(
+        vector_store=store,
+        graph=graph,
+        access_log=log,
+        policy=ConsolidationPolicy(promote_after_accesses=3),
+        clock=lambda: NOW,
+    ).run()
+    assert report.promoted == (result.item.id,)
+    assert len(graph.calls) == 2  # the failed write, then the promotion
