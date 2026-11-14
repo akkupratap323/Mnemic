@@ -103,6 +103,10 @@ class HybridMemory:
             except Exception as exc:  # graph failure must not lose the vector write
                 graph_error = f'{type(exc).__name__}: {exc}'
 
+        if graph_written and self.access_log is not None:
+            # already in the graph tier: consolidation must not promote it again
+            self.access_log.mark_promoted(item.id)
+
         if self.metrics is not None:
             self.metrics.record_remember(graph_written=graph_written)
 

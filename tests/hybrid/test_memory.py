@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 import pytest
 
+from mnemic.hybrid.access import AccessLog
 from mnemic.hybrid.errors import InvalidInput
 from mnemic.hybrid.memory import HybridMemory
 from mnemic.hybrid.types import Tier
@@ -67,6 +68,39 @@ async def test_graph_failure_never_loses_vector_write():
     # the vector memory is still durably stored
     assert await mem.vector_store.count() == 1
     assert await mem.vector_store.get(result.item.id) is not None
+
+
+async def test_graph_write_marks_memory_promoted():
+    log = AccessLog()
+    mem = HybridMemory(
+        embedder=FakeEmbedder(),
+        vector_store=InMemoryVectorStore(),
+        graph=RecordingGraph(),
+        access_log=log,
+        clock=lambda: FIXED,
+        id_factory=make_counter_ids(),
+    )
+    signal = await mem.remember('decision: adopt FalkorDB for the graph tier')
+    noise = await mem.remember('had lunch at noon')
+    assert signal.graph_written is True
+    assert log.is_promoted(signal.item.id) is True
+    assert noise.graph_written is False
+    assert log.is_promoted(noise.item.id) is False
+
+
+async def test_failed_graph_write_is_not_marked_promoted():
+    log = AccessLog()
+    mem = HybridMemory(
+        embedder=FakeEmbedder(),
+        vector_store=InMemoryVectorStore(),
+        graph=RecordingGraph(raise_on_call=True),
+        access_log=log,
+        clock=lambda: FIXED,
+        id_factory=make_counter_ids(),
+    )
+    result = await mem.remember('bug: null pointer on login')
+    assert result.graph_written is False
+    assert log.is_promoted(result.item.id) is False
 
 
 async def test_deterministic_id_and_clock():
