@@ -60,6 +60,33 @@ async def test_zero_vector_rejected_on_add():
         await s.add(item('a', [0, 0, 0]))
 
 
+async def test_rejected_zero_vector_does_not_fix_dimension():
+    s = InMemoryVectorStore()
+    with pytest.raises(InvalidInput):
+        await s.add(item('a', [0, 0, 0]))
+    # the store is still empty, so any dimension is still allowed
+    await s.add(item('b', [1, 0]))
+    assert await s.count() == 1
+    with pytest.raises(DimensionMismatch):
+        await s.add(item('c', [1, 0, 0]))
+
+
+async def test_rejected_zero_vector_leaves_empty_store_searchable():
+    s = InMemoryVectorStore()
+    with pytest.raises(InvalidInput):
+        await s.add(item('a', [0, 0, 0]))
+    assert await s.search([1, 0]) == []
+
+
+async def test_zero_vector_with_wrong_dimension_rejected_as_invalid():
+    # same order as SQLiteVectorStore: magnitude is checked before dimension
+    s = InMemoryVectorStore()
+    await s.add(item('a', [1, 0, 0]))
+    with pytest.raises(InvalidInput):
+        await s.add(item('b', [0, 0]))
+    assert await s.count() == 1
+
+
 async def test_zero_query_rejected_on_search():
     s = InMemoryVectorStore()
     await s.add(item('a', [1, 0, 0]))
