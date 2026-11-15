@@ -54,12 +54,13 @@ class InMemoryVectorStore:
     async def add(self, item: MemoryItem) -> None:
         if item.id in self._items:
             raise DuplicateItem(f'item id already exists: {item.id!r}')
+        # validate before fixing the dimension, so a rejected item can't lock it
+        _norm(item.embedding)  # validates non-zero magnitude
         dim = len(item.embedding)
         if self._dim is None:
             self._dim = dim
         elif dim != self._dim:
             raise DimensionMismatch(f'expected dim {self._dim}, got {dim}')
-        _norm(item.embedding)  # validates non-zero magnitude
         self._items[item.id] = item
 
     async def search(
