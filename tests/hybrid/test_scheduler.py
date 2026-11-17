@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 
 import pytest
@@ -58,3 +59,67 @@ async def test_stop_before_start_is_safe():
     sched = ConsolidationScheduler(consolidator=SpyConsolidator(), interval_seconds=1)
     sched.stop()
     assert sched.running is False
+
+
+@dataclass
+class FlakyConsolidator:
+    """Raises on the passes listed in ``fail_on`` (1-based), succeeds otherwise."""
+
+    fail_on: set[int]
+    runs: int = 0
+
+    async def run(self) -> ConsolidationReport:
+        self.runs += 1
+        if self.runs in self.fail_on:
+            raise OSError(f'database is locked (pass {self.runs})')
+        return ConsolidationReport(scanned=self.runs)
+
+
+def _stop_after(sched: ConsolidationScheduler, sleeps: int, seen: list[str | None]):
+    async def fake_sleep(_seconds: float) -> None:
+        seen.append(sched.last_error)
+        if len(seen) >= sleeps:
+            sched.stop()
+
+    return fake_sleep
+
+
+async def test_a_failed_pass_does_not_stop_the_loop():
+    flaky = FlakyConsolidator(fail_on={1})
+    sched = ConsolidationScheduler(consolidator=flaky, interval_seconds=1)
+    seen: list[str | None] = []
+    sched.sleeper = _stop_after(sched, 3, seen)
+
+    await sched.run_forever()
+
+    assert flaky.runs == 3  # failed, slept, ran, slept, ran, slept->stop
+    assert seen == ['OSError: database is locked (pass 1)', None, None]
+    assert sched.failures == 1
+    assert sched.last_error is None
+    assert sched.running is False
+
+
+async def test_repeated_failures_are_counted_and_still_wait_the_interval():
+    flaky = FlakyConsolidator(fail_on={1, 2})
+    sched = ConsolidationScheduler(consolidator=flaky, interval_seconds=1)
+    seen: list[str | None] = []
+    sched.sleeper = _stop_after(sched, 2, seen)
+
+    await sched.run_forever()
+
+    assert flaky.runs == 2  # one pass per interval, no tight retry loop
+    assert sched.failures == 2
+    assert sched.last_error == 'OSError: database is locked (pass 2)'
+
+
+async def test_cancellation_still_stops_the_loop():
+    @dataclass
+    class CancelledConsolidator:
+        async def run(self) -> ConsolidationReport:
+            raise asyncio.CancelledError
+
+    sched = ConsolidationScheduler(consolidator=CancelledConsolidator(), interval_seconds=1)
+    sched.sleeper = _stop_after(sched, 1, [])
+    with pytest.raises(asyncio.CancelledError):
+        await sched.run_forever()
+    assert sched.failures == 0
